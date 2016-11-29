@@ -40,7 +40,7 @@ dataset = dataset(:,:,:,1:500);
 ```
 Finally, you have to set the options of the algorithm and run it:
 ```
-opts.library = 'caffe';
+opts.library = 'caffe' % or 'matconvnet';
 opts.net = net;
 v = universal_perturbation(dataset, opts);
 ```
