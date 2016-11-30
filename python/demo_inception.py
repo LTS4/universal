@@ -5,6 +5,8 @@ import os.path
 from prepare_imagenet_data import preprocess_image_batch, create_imagenet_npy, undo_image_avg
 import matplotlib.pyplot as plt
 import sys, getopt
+import urllib
+import zipfile
 
 from timeit import time
 
@@ -32,11 +34,19 @@ if __name__ == '__main__':
         if opt == '-i':
             path_test_image = arg
 
-    # Take as inputs the path to imagenet data, and a file (?)
     with tf.device(device):
         persisted_sess = tf.Session()
+        inception_model_path = os.path.join('data', 'tensorflow_inception_graph.pb')
 
-        model = os.path.join('data', 'tensorflow_inception_graph.pb')
+        if os.path.isfile(inception_model_path) == 0:
+            print "Downloading Inception model..."
+            urllib.urlretrieve ("https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip", os.path.join('data', 'inception5h.zip'))
+            # Unzipping the file
+            zip_ref = zipfile.ZipFile(os.path.join('data', 'inception5h.zip'), 'r')
+            zip_ref.extract('tensorflow_inception_graph.pb', 'data')
+            zip_ref.close()
+
+        model = os.path.join(inception_model_path)
 
         # Load the Inception model
         with gfile.FastGFile(model, 'rb') as f:
