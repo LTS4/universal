@@ -94,7 +94,7 @@ if __name__ == '__main__':
                 X = np.load(datafile)
 
             # Running universal perturbation
-            v = universal_perturbation(X[0:5000, :, :, :], f, grad_fs, delta=0.2)
+            v = universal_perturbation(X, f, grad_fs, delta=0.2)
 
             # Saving the universal perturbation
             np.save(os.path.join(file_perturbation), v)
