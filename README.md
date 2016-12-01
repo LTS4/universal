@@ -1,4 +1,4 @@
-# universal
+# Universal adversarial perturbations
 
 *matlab*: MATLAB code to generate universal perturbations, using [Caffe](https://github.com/BVLC/caffe) or [MatConvNet](https://github.com/vlfeat/matconvnet).
 
