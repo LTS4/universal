@@ -20,9 +20,7 @@ IMPORTANT NOTE:
 When computing universal perturbations, the current Python code requires a significant amount of pre-processing time for compiling the gradient functions wrt input images.
 This is apparently a known issue with how TensorFlow handles the gradients of non-scalar functions (see e.g., https://github.com/tensorflow/tensorflow/issues/675).
 Suggestions for improvements are welcome!
-
 For the time being, we recommend the usage of interactive sessions, as this pre-computing step is done only once per session.
---------------
 
 To compute a universal perturbation for your model, please follow the same struture as in `demo_inception.py`.
 In particular, you should use the `universal_perturbation` function (see `universal_pert.py` for details), with the set of training images 
