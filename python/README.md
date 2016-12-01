@@ -15,6 +15,8 @@ In this example, a pre-computed universal perturbation in `data/universal.npy` i
 
 ###Computing a universal perturbation for your model
 
+** Important note**
+
 When computing universal perturbations, the current Python code requires a significant amount of pre-processing time for compiling the gradient functions wrt input images.
 This is apparently a known issue with how TensorFlow handles the gradients of non-scalar functions (see e.g., https://github.com/tensorflow/tensorflow/issues/675).
 Suggestions for improvements are welcome!
