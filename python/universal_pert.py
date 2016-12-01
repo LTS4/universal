@@ -56,7 +56,7 @@ def universal_perturbation(dataset, f, grads, delta=0.2, max_iter_uni = np.inf, 
             cur_img = dataset[k:(k+1), :, :, :]
 
             if int(np.argmax(np.array(f(cur_img)).flatten())) == int(np.argmax(np.array(f(cur_img+v)).flatten())):
-                print ">> k = ", k, ', iter = ', itr
+                print ">> k = ", k, ', pass #', itr
 
                 # Compute adversarial perturbation
                 dr,iter,_,_ = deepfool(cur_img + v, f, grads, num_classes=num_classes, overshoot=overshoot, max_iter=max_iter_df)
