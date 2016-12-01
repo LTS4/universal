@@ -81,7 +81,6 @@ def universal_perturbation(dataset, f, grads, delta=0.2, max_iter_uni = np.inf, 
 
         # Compute the estimated labels in batches
         for ii in range(0, num_batches):
-            print "ii = ",
             m = (ii * batch_size)
             M = min((ii+1)*batch_size, num_images)
             est_labels_orig[m:M] = np.argmax(f(dataset[m:M, :, :, :]), axis=1).flatten()
