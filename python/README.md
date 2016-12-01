@@ -11,7 +11,7 @@ To get started, you can run the demo code to apply a pre-computed universal pert
 python demo_inception.py -i data/test_img.png	
 ```
 This will download the pre-trained model, and show the image without and with universal perturbation with the estimated labels.
-In this example, a pre-computed universal perturbation in `data/universal.npy` is used.
+In this example, the pre-computed universal perturbation in `data/universal.npy` is used.
 
 ###Computing a universal perturbation for your model
 
