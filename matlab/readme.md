@@ -34,7 +34,7 @@ caffe.set_device(0); % choose the first gpu
 
 net_model = 'deploy_googlenet.prototxt'; % GoogLeNet without softmax layer
 net_weights = 'googlenet.caffemodel'; % weights
-net = caffe.Net(net_model, net_weights, 'test'); % run with phase test (so that dropout isn't applied)
+net = caffe.Net(net_model, net_weights, 'test'); % run with phase test
 ```
 After loading your pre-trained model using your preferred framework, you have to load the set of images to compute the universal perturbation. __Be careful that the images should be pre-processed in the same way that the training images are pre-processed.__ We provide an example script in `makeImagenetData.m`, where 10,000 training images are used. Once you have your data, you can load it and compute a universal perturbation as follows:
 
