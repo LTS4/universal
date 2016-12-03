@@ -57,7 +57,7 @@ else
 end
 
 itr = 0;
-while(fooling_rate<(1-opts.delta)*num_images && itr<opts.MAX_ITER_UNIV)
+while(fooling_rate<(1-opts.delta) && itr<opts.MAX_ITER_UNIV)
     itr = itr + 1;    
     dataset = dataset(:,:,:,randperm(num_images)); % shuffle the dataset
     disp('Data randomly permuted');
@@ -70,14 +70,15 @@ while(fooling_rate<(1-opts.delta)*num_images && itr<opts.MAX_ITER_UNIV)
             end
         end
         clc;
-        fprintf('Fooling rate = %.3f\n', fooling_rate);
-        disp(cnt);
+        fprintf('Fooling rate for pass %d = %.3f\n', itr-1, fooling_rate);
+        fprintf('Iteration %d/%d\n', cnt, num_images);
+        
     end
+    fprintf('Computing the new fooling rate...\n');
     est_labels_orig = predict(dataset(:,:,:,1:num_images)); % compute the original labels
     est_labels_pert = predict(bsxfun(@plus,dataset(:,:,:,1:num_images),v)); % compute the perturbed labels
     fooling_rate = sum(est_labels_orig~=est_labels_pert)/num_images; % compute the fooling rate
-    
-    fprintf('Fooling rate = %f\n', fooling_rate);
+    fprintf('New fooling rate = %f\n', fooling_rate);
 end
 
 function v_projected = proj_lp(v, xi, p)
