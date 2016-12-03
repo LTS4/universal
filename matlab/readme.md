@@ -36,12 +36,15 @@ net_model = 'deploy_googlenet.prototxt'; % GoogLeNet without softmax layer
 net_weights = 'googlenet.caffemodel'; % weights
 net = caffe.Net(net_model, net_weights, 'test'); % run with phase test (so that dropout isn't applied)
 ```
-After loading your pre-trained model using your preferred framework, you have to load the set of images to compute the universal perturbation. __Be careful that the images should be pre-processed in the same way that the training images are pre-processed.__ We provide an example script in `makeImagenetData.m`, where 10,000 training images are used.
+After loading your pre-trained model using your preferred framework, you have to load the set of images to compute the universal perturbation. __Be careful that the images should be pre-processed in the same way that the training images are pre-processed.__ We provide an example script in `makeImagenetData.m`, where 10,000 training images are used. Once you have your data, you can load it and compute a universal perturbation as follows:
 
-Finally, you have to set the options of the algorithm and run it:
 ```
+% Load data
+dataset = h5read(fullfile('data', 'ImageNet.h5'), ['/batch1']);
+% Set parameters
 opts.library = 'caffe' % or 'matconvnet';
 opts.net = net;
+% Compute universal perturbation
 v = universal_perturbation(dataset, opts);
 ```
 
