@@ -19,12 +19,15 @@ This function implements the algorithm proposed in [[1]](http://arxiv.org/pdf/16
 - `v`: a `W*H*C` perturbation image.
 
 ##Usage
+
+A demo using Caffe is provided in `demo_caffe.m`.
+
 First of all, you need to setup the paths to [DeepFool](http://github.com/lts4/deepfool) and [Caffe](http://caffe.berkeleyvision.org) (or [MatConvNet](http://www.vlfeat.org/matconvnet/)), e.g.:
 ```
 addpath('./DeepFool');
 addpath('./caffe/matlab');
 ```
-Now, you have to load your pre-trained model. __Note that the last layer (usually softmax layer) should have been removed (see [DeepFool](http://github.com/lts4/deepfool) for more information).__ For example, in [Caffe](http://caffe.berkeleyvision.org) you can do something like:
+Next, you have to load your pre-trained model. __Note that the last layer (usually softmax layer) should have been removed (see [DeepFool](http://github.com/lts4/deepfool) for more information).__ We provide in the `data` folder the prototxt files for the common networks, without the softmax layer. The pre-trained model can be loaded as follows, using Caffe:
 ```
 caffe.set_mode_gpu(); % initialize Caffe in gpu mode
 caffe.set_device(0); % choose the first gpu
@@ -33,11 +36,8 @@ net_model = 'deploy_googlenet.prototxt'; % GoogLeNet without softmax layer
 net_weights = 'googlenet.caffemodel'; % weights
 net = caffe.Net(net_model, net_weights, 'test'); % run with phase test (so that dropout isn't applied)
 ```
-After loading your pre-trained model using your preferred framework, you have to load the set of images to compute the universal perturbation. __Be careful that the images should be pre-processed in the same way that the training images are pre-processed.__ As an example, one can load the first 500 ImageNet's training images from an HDF5 file:
-```
-dataset = h5read('/datasets/ImageNet_training.h5',['/batch',num2str(1)]);
-dataset = dataset(:,:,:,1:500);
-```
+After loading your pre-trained model using your preferred framework, you have to load the set of images to compute the universal perturbation. __Be careful that the images should be pre-processed in the same way that the training images are pre-processed.__ We provide an example script in `makeImagenetData.m`, where 10,000 training images are used.
+
 Finally, you have to set the options of the algorithm and run it:
 ```
 opts.library = 'caffe' % or 'matconvnet';
