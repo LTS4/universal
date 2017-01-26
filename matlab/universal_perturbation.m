@@ -88,5 +88,5 @@ function v_projected = proj_lp(v, xi, p)
 if p==Inf
     v_projected = sign(v).*min(abs(v),xi);
 elseif p==2
-    v_projected = v/norm(v(:))*xi;
+    v_projected = v * min(1, xi/norm(v(:)));
 end
