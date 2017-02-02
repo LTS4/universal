@@ -7,7 +7,8 @@ def proj_lp(v, xi, p):
 
     # SUPPORTS only p = 2 and p = Inf for now
     if p == 2:
-        v = v / np.linalg.norm(v.flatten(1)) * xi
+        v = v * min(1, xi/np.linalg.norm(v.flatten(1)))
+        # v = v / np.linalg.norm(v.flatten(1)) * xi
     elif p == np.inf:
         v = np.sign(v) * np.minimum(abs(v), xi)
     else:
