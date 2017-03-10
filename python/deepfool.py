@@ -1,5 +1,4 @@
 import numpy as np
-from timeit import time
 
 def deepfool(image, f, grads, num_classes=10, overshoot=0.02, max_iter=50):
 
@@ -12,8 +11,6 @@ def deepfool(image, f, grads, num_classes=10, overshoot=0.02, max_iter=50):
        :param max_iter: maximum number of iterations for deepfool (default = 10)
        :return: minimal perturbation that fools the classifier, number of iterations that it required, new estimated_label and perturbed image
     """
-
-    t = time.time()
 
     f_image = np.array(f(image)).flatten()
     I = (np.array(f_image)).flatten().argsort()[::-1]
@@ -63,6 +60,4 @@ def deepfool(image, f, grads, num_classes=10, overshoot=0.02, max_iter=50):
 
     r_tot = (1+overshoot)*r_tot
 
-    est_time = time.time() - t
-    print "estimated time = ", est_time
     return r_tot, loop_i, k_i, pert_image

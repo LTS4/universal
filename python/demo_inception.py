@@ -5,10 +5,14 @@ import os.path
 from prepare_imagenet_data import preprocess_image_batch, create_imagenet_npy, undo_image_avg
 import matplotlib.pyplot as plt
 import sys, getopt
-import urllib
 import zipfile
-
 from timeit import time
+
+if sys.version_info[0] >= 3:
+    from urllib.request import urlretrieve
+else:
+    from urllib import urlretrieve
+
 
 from universal_pert import universal_perturbation
 device = '/gpu:0'
@@ -39,8 +43,8 @@ if __name__ == '__main__':
         inception_model_path = os.path.join('data', 'tensorflow_inception_graph.pb')
 
         if os.path.isfile(inception_model_path) == 0:
-            print "Downloading Inception model..."
-            urllib.urlretrieve ("https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip", os.path.join('data', 'inception5h.zip'))
+            print('Downloading Inception model...')
+            urlretrieve ("https://storage.googleapis.com/download.tensorflow.org/models/inception5h.zip", os.path.join('data', 'inception5h.zip'))
             # Unzipping the file
             zip_ref = zipfile.ZipFile(os.path.join('data', 'inception5h.zip'), 'r')
             zip_ref.extract('tensorflow_inception_graph.pb', 'data')
@@ -60,7 +64,7 @@ if __name__ == '__main__':
         persisted_input = persisted_sess.graph.get_tensor_by_name("input:0")
         persisted_output = persisted_sess.graph.get_tensor_by_name("softmax2_pre_activation:0")
 
-        print ">> Computing feedforward function..."
+        print('>> Computing feedforward function...')
         def f(image_inp): return persisted_sess.run(persisted_output, feed_dict={persisted_input: np.reshape(image_inp, (-1, 224, 224, 3))})
 
         file_perturbation = os.path.join('data', 'universal.npy')
@@ -68,20 +72,20 @@ if __name__ == '__main__':
         if os.path.isfile(file_perturbation) == 0:
 
             # TODO: Optimize this construction part!
-            print ">> Compiling the gradient tensorflow functions. This might take some time..."
+            print('>> Compiling the gradient tensorflow functions. This might take some time...')
             scalar_out = [tf.slice(persisted_output, [0, i], [1, 1]) for i in range(0, 1001)]
             dydx = [tf.gradients(scalar_out[i], [persisted_input])[0] for i in range(0, 1001)]
 
-            print ">> Computing gradient function..."
+            print('>> Computing gradient function...')
             def grad_fs(image_inp, inds): return [persisted_sess.run(dydx[i], feed_dict={persisted_input: image_inp}) for i in inds]
 
             # Load/Create data
             datafile = os.path.join('data', 'imagenet_data.npy')
             if os.path.isfile(datafile) == 0:
-                print ">> Creating pre-processed imagenet data..."
+                print('>> Creating pre-processed imagenet data...')
                 X = create_imagenet_npy(path_train_imagenet)
 
-                print ">> Saving the pre-processed imagenet data"
+                print('>> Saving the pre-processed imagenet data')
                 if not os.path.exists('data'):
                     os.makedirs('data')
 
@@ -90,7 +94,7 @@ if __name__ == '__main__':
                 np.save(os.path.join('data', 'imagenet_data.npy'), X)
 
             else:
-                print ">> Pre-processed imagenet data detected"
+                print('>> Pre-processed imagenet data detected')
                 X = np.load(datafile)
 
             # Running universal perturbation
@@ -100,10 +104,10 @@ if __name__ == '__main__':
             np.save(os.path.join(file_perturbation), v)
 
         else:
-            print ">> Found a pre-computed universal perturbation! Retrieving it from ", file_perturbation
+            print('>> Found a pre-computed universal perturbation! Retrieving it from ", file_perturbation')
             v = np.load(file_perturbation)
 
-        print ">> Testing the universal perturbation on an image"
+        print('>> Testing the universal perturbation on an image')
 
         # Test the perturbation on the image
         labels = open(os.path.join('data', 'labels.txt'), 'r').read().split('\n')
