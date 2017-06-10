@@ -3,7 +3,7 @@ import numpy as np
 def deepfool(image, f, grads, num_classes=10, overshoot=0.02, max_iter=50):
 
     """
-       :param dataset: Image of size HxWx3
+       :param image: Image of size HxWx3
        :param f: feedforward function (input: images, output: values of activation BEFORE softmax).
        :param grads: gradient functions with respect to input (as many gradients as classes).
        :param num_classes: num_classes (limits the number of classes to test against, by default = 10)
