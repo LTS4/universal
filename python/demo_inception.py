@@ -16,6 +16,19 @@ else:
 
 from universal_pert import universal_perturbation
 device = '/gpu:0'
+num_classes = 10
+
+def jacobian(y_flat, x, inds):
+    n = num_classes # Not really necessary, just a quick fix.
+    loop_vars = [
+         tf.constant(0, tf.int32),
+         tf.TensorArray(tf.float32, size=n),
+    ]
+    _, jacobian = tf.while_loop(
+        lambda j,_: j < n,
+        lambda j,result: (j+1, result.write(j, tf.gradients(y_flat[inds[j]], x))),
+        loop_vars)
+    return jacobian.stack()
 
 if __name__ == '__main__':
 
@@ -25,7 +38,7 @@ if __name__ == '__main__':
     # Default values
     path_train_imagenet = '/datasets2/ILSVRC2012/train'
     path_test_image = 'data/test_img.png'
-
+    
     try:
         opts, args = getopt.getopt(argv,"i:t:",["test_image=","training_path="])
     except getopt.GetoptError:
@@ -73,11 +86,12 @@ if __name__ == '__main__':
 
             # TODO: Optimize this construction part!
             print('>> Compiling the gradient tensorflow functions. This might take some time...')
-            scalar_out = [tf.slice(persisted_output, [0, i], [1, 1]) for i in range(0, 1001)]
-            dydx = [tf.gradients(scalar_out[i], [persisted_input])[0] for i in range(0, 1001)]
+            y_flat = tf.reshape(persisted_output, (-1,))
+            inds = tf.placeholder(tf.int32, shape=(num_classes,))
+            dydx = jacobian(y_flat,persisted_input,inds)
 
             print('>> Computing gradient function...')
-            def grad_fs(image_inp, inds): return [persisted_sess.run(dydx[i], feed_dict={persisted_input: image_inp}) for i in inds]
+            def grad_fs(image_inp, indices): return persisted_sess.run(dydx, feed_dict={persisted_input: image_inp, inds: indices}).squeeze(axis=1)
 
             # Load/Create data
             datafile = os.path.join('data', 'imagenet_data.npy')
@@ -98,7 +112,7 @@ if __name__ == '__main__':
                 X = np.load(datafile)
 
             # Running universal perturbation
-            v = universal_perturbation(X, f, grad_fs, delta=0.2)
+            v = universal_perturbation(X, f, grad_fs, delta=0.2,num_classes=num_classes)
 
             # Saving the universal perturbation
             np.save(os.path.join(file_perturbation), v)
