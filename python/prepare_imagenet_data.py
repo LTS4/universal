@@ -55,7 +55,7 @@ def create_imagenet_npy(path_train_imagenet, len_batch=10000):
     num_classes = 1000
 
     im_array = np.zeros([len_batch] + sz_img + [num_channels], dtype=np.float32)
-    num_imgs_per_batch = len_batch / num_classes
+    num_imgs_per_batch = int(len_batch / num_classes)
 
     dirs = [x[0] for x in os.walk(path_train_imagenet)]
     dirs = dirs[1:]
