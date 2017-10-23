@@ -19,8 +19,6 @@ To compute a universal perturbation for your model, please follow the same strut
 In particular, you should use the `universal_perturbation` function (see `universal_pert.py` for details), with the set of training images 
 used to compute the perturbation, as well as the feedforward and gradient functions.
 
-For the time being, we recommend the usage of interactive sessions, as this pre-computing step is done only once per session.
-
 ## Reference
 [1] S. Moosavi-Dezfooli\*, A. Fawzi\*, O. Fawzi, P. Frossard:
 [*Universal adversarial perturbations*](http://arxiv.org/pdf/1610.08401), CVPR 2017.
