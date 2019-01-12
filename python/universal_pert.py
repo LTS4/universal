@@ -40,9 +40,14 @@ def universal_perturbation(dataset, f, grads, delta=0.2, max_iter_uni = np.inf, 
 
     :return: the universal perturbation.
     """
-
-    v = 0
+    v=0
     fooling_rate = 0.0
+    import os
+    file_perturbation=os.path.join(os.getcwd(),'data','universal_partial.npy')
+    if os.path.isfile(file_perturbation) == 1:
+        v = np.load(file_perturbation)
+        fooling_rate=fooling_rate_calc(v,dataset,f)
+        print('>> Loaded perturbation file from disk perturbation fooling_rate obesrved :: ',fooling_rate)
     num_images =  np.shape(dataset)[0] # The images should be stacked ALONG FIRST DIMENSION
 
     itr = 0
@@ -65,30 +70,42 @@ def universal_perturbation(dataset, f, grads, delta=0.2, max_iter_uni = np.inf, 
                 # Make sure it converged...
                 if iter < max_iter_df-1:
                     v = v + dr
-
                     # Project on l_p ball
                     v = proj_lp(v, xi, p)
+                    print('>> iters required ::',iter)
+                else:
+                    print('>> k = ', k, ', pass #', itr,'this k to deepfool no convergence for 10 iters')
+
+            else:
+                print('>> k = ', k, ', pass #', itr,'Perturb success for this image without deepfool')
 
         itr = itr + 1
+        np.save(file_perturbation,v)
+        fooling_rate=fooling_rate_calc(v,dataset,f)
+        print('FOOLING RATE = ', fooling_rate)
+    return v
 
         # Perturb the dataset with computed perturbation
-        dataset_perturbed = dataset + v
+def fooling_rate_calc(v,dataset,f):
+    dataset_perturbed = dataset + v
+    num_images =  np.shape(dataset)[0]
+    est_labels_orig = np.zeros((num_images))
+    est_labels_pert = np.zeros((num_images))
 
-        est_labels_orig = np.zeros((num_images))
-        est_labels_pert = np.zeros((num_images))
+    batch_size = 100
+    num_batches = np.int(np.ceil(np.float(num_images) / np.float(batch_size)))
 
-        batch_size = 100
-        num_batches = np.int(np.ceil(np.float(num_images) / np.float(batch_size)))
+    # Compute the estimated labels in batches
+    for ii in range(0, num_batches):
+        m = (ii * batch_size)
+        M = min((ii+1)*batch_size, num_images)
+        est_labels_orig[m:M] = np.argmax(f(dataset[m:M, :, :, :]), axis=1).flatten()
+        est_labels_pert[m:M] = np.argmax(f(dataset_perturbed[m:M, :, :, :]), axis=1).flatten()
 
-        # Compute the estimated labels in batches
-        for ii in range(0, num_batches):
-            m = (ii * batch_size)
-            M = min((ii+1)*batch_size, num_images)
-            est_labels_orig[m:M] = np.argmax(f(dataset[m:M, :, :, :]), axis=1).flatten()
-            est_labels_pert[m:M] = np.argmax(f(dataset_perturbed[m:M, :, :, :]), axis=1).flatten()
+    # Compute the fooling rate
+    fooling_rate = float(np.sum(est_labels_pert != est_labels_orig) / float(num_images))
+    return fooling_rate
+    
+    
 
-        # Compute the fooling rate
-        fooling_rate = float(np.sum(est_labels_pert != est_labels_orig) / float(num_images))
-        print('FOOLING RATE = ', fooling_rate)
-
-    return v
+    
